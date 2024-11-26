@@ -1,15 +1,14 @@
 # Decoders para a Linha DTL
 
-Este repositório contém os decoders para os endpoints da linha DTL da KHOMP.
+Este repositório contém os decodificadores para os endpoints da linha DTL da KHOMP.
 
-Os decoders são funções JS que facilitam a interpretação dos dados enviados pelos endpoints ao servidor de rede IoT.
+Os decodificadores são implementações em JavaScript que simplificam a interpretação dos dados enviados pelos endpoints para o servidor de rede IoT.
 
-ATENÇÃO: Para cada servidor de rede IoT e também, modelo de endpoint da linha DTL, possui um tipo diferente de decoder.
-Cuide na hora de selecionar o decoder do seu dispositivo.
+**Aviso Importante:** Cada servidor de rede IoT e cada modelo de endpoint da linha DTL possuem tipos específicos de decodificadores. É fundamental selecionar o decodificador adequado para o seu dispositivo.
 
 ## 1. Decoders Disponíveis
 
-### 1.1 Decoders para o servidor de rede ChirpStack versão 4:
+### [1.1 Decoders para o servidor de rede ChirpStack versão 4:](https://github.com/support-khomp/iot-decoders/tree/main/Endpoints-Linha-DTL/ChirpStack-V4)
 
 #### DTL-200:
 - [DTL-200 na versão padrão](https://github.com/support-khomp/iot-decoders/blob/main/Endpoints-Linha-DTL/ChirpStack-V4/DTL-200/DTL-200-Default-para-ChirpStackV4.txt)
