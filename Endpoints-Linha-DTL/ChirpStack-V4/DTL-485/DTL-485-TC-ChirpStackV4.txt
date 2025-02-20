@@ -112,7 +112,7 @@ function Decode(fPort, bytes, variables) {
     var sensor;
     
     if(bytes[0]==0x33)
-      sensor= "DTL-485 Leitor de corrente";
+      sensor= "DTL-485-Leitor-de-corrente";
       
 	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
 	  
