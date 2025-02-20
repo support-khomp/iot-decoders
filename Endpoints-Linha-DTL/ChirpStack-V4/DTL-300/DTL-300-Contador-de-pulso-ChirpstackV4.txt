@@ -4,7 +4,7 @@ function decodeUplink(input) {
         };   
 }
 function datalog(i,bytes){
-  var aa=(bytes[0+i]&0x08)?"DTL-300-Contador-pulso":"CPL01";
+  var aa=(bytes[0+i]&0x08)?"Conta-pulso":"CPL01";
   var bb=(bytes[0+i]&0x20)?"PART":"SUM";
   var cc=(bytes[0+i]&0x10)?"YES":"NO"; 
   var dd=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
