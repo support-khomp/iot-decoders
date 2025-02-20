@@ -81,7 +81,7 @@ function Decode(fPort, bytes, variables) {
     var sensor;
     
     if(bytes[0]==0x1D)
-      sensor= "WL03A-LB";
+      sensor= "DTL-300-Vazamento-por-contato";
       
     if(bytes[4]==0xff)
       sub_band="NULL";
