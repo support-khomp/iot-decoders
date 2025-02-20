@@ -148,7 +148,7 @@ if(fPort==0x02)
     var sensor;
     
     if(bytes[0]==0x1C)
-      sensor= "DTL-300_3x-CONTATO-SECO";
+      sensor= "DTL-300-CONTATO-SECO";
       
 	  var firm_ver= (bytes[1]&0x0f)+'.'+(bytes[2]>>4&0x0f)+'.'+(bytes[2]&0x0f);
 	  
