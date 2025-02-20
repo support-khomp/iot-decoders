@@ -4,7 +4,7 @@ function decodeUplink(input) {
         };   
 }
 function datalog(i,bytes){
-  var aa=(bytes[0+i]&0x08)?"COUNT3x":"CPL01";
+  var aa=(bytes[0+i]&0x08)?"DTL-300-Contador-pulso":"CPL01";
   var bb=(bytes[0+i]&0x20)?"PART":"SUM";
   var cc=(bytes[0+i]&0x10)?"YES":"NO"; 
   var dd=(bytes[0+i]&0x02)?"TRUE":"FALSE"; 
@@ -95,7 +95,7 @@ function Decode(fPort, bytes, variables) {
     var sensor;
     
     if(bytes[0]==0x20)
-      sensor= "Contador de pulso";
+      sensor= "DTL-300-Contador-de-pulsos";
       
     if(bytes[4]==0xff)
       sub_band="NULL";
