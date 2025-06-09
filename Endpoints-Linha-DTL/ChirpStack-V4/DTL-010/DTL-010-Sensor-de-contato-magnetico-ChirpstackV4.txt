@@ -1,0 +1,63 @@
+function decodeUplink(input) {
+        return { 
+            data: Decode(input.fPort, input.bytes, input.variables)
+        };   
+}
+function Decode(fPort, bytes, variables) {
+  var value=(bytes[0]<<8 | bytes[1])&0x3FFF;
+  var bat=value/1000;   //Bateria, unidade:V
+  
+  var door_open_status=bytes[0]&0x80?1:0;   //1:aberto, 0:fechado
+  var water_leak_status=bytes[0]&0x40?1:0;
+  
+  var mod=bytes[2];
+  var alarm=bytes[9]&0x01;
+  
+  if(mod==1){
+    var open_times=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
+    var open_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];   //unidade:min
+    if(bytes.length==10)
+    return {
+      Modelo:"DTL-010",
+      Bateria:bat,
+      Modo:mod,
+      Estado_porta:door_open_status,
+      Quantidade_abertura:open_times,
+      Tempo_aberto:open_duration,
+      Alarme:alarm
+    };
+  }
+  else if(mod==2)
+  {
+  var leak_times=bytes[3]<<16 | bytes[4]<<8 | bytes[5];
+  var leak_duration=bytes[6]<<16 | bytes[7]<<8 | bytes[8];    //unidade:min
+  if(bytes.length==10)
+  return {
+      Modelo:"DTL-010",
+      Bateria:bat,
+      Modo:mod,
+      Estado_vazamento:water_leak_status,
+      Quantidade_vazamentos:leak_times,
+      Tempo_vazamento:leak_duration
+  };
+  }
+  else if(mod==3)
+  if(bytes.length==10)
+  {
+  return {
+      Modelo:"DTL-010",
+      Bateria:bat,
+      Modo:mod,
+      Estado_porta:door_open_status,
+      Estado_vazamento:water_leak_status,
+      Alarme:alarm
+  };
+  }
+  else{
+  return {
+      Modelo:"DTL-010",
+      Bateria:bat,
+      Modo:mod,
+  };
+  }
+}
