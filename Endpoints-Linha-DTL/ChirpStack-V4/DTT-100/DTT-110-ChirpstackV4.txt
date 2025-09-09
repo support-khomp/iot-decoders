@@ -1,0 +1,114 @@
+function decodeUplink(input) {
+  var port = input.fPort;
+  var bytes = input.bytes;
+  var data = {};
+
+  const toSigned = byte => byte << 24 >> 24;
+  const parseCoord = (bytes, offset) => 
+    (bytes[offset]<<24 | bytes[offset+1]<<16 | bytes[offset+2]<<8 | bytes[offset+3])/1e6;
+
+  switch(port) {
+    case 2:
+    case 3:
+      data.latitude = parseCoord(bytes, 0);
+      data.longitude = parseCoord(bytes, 4);
+      data.bateria = ((bytes[16] & 0x3f)<<8 | bytes[17])/1000;
+      data.alarme = (bytes[16] & 0x40) ? true : false;
+      data.modo = bytes[18] & 0xC0;
+      data.movimento = (bytes[18] & 0x10) ? "MOVIMENTANDO" : "PARADO";
+
+      if(port === 2 && (bytes[18] & 0xC0) !== 1 && !(bytes[18]>>3 & 1)) {
+        data.temperatura = (bytes[19]<<8 | bytes[20])/10;
+        data.umidade = (bytes[21]<<8 | bytes[22])/10;
+      }
+      break;
+
+    case 4:
+      data.latitude = parseCoord(bytes, 0);
+      data.longitude = parseCoord(bytes, 4);
+      data.timestamp = new Date(
+        bytes[16]<<8 | bytes[17], bytes[18]-1, bytes[19],
+        bytes[20], bytes[21], bytes[22]
+      ).toISOString();
+      data.bateria = ((bytes[23] & 0x3f)<<8 | bytes[24])/1000;
+      data.movimento = (bytes[23] & 0x40) ? "MOVIMENTANDO" : "PARADO";
+     
+      break;
+
+    case 5:
+      const bands = {
+        1: 'EU868', 2: 'US915', 3: 'IN865', 4: 'AU915', 5: 'KZ865',
+        6: 'RU864', 7: 'AS923', 8: 'AS923_1', 9: 'AS923_2', 10: 'AS923_3',
+        11: 'CN470', 12: 'EU433', 13: 'KR920', 14: 'MA869'
+      };
+      const Mode = {
+        1: 'GPS', 2: 'BLE', 3: 'Hibrido'
+      };      
+      data.modelo = bytes[0] === 0x13 ? 'DTT-100' : 'DTT-110';
+      data.firmware = `${bytes[1]&0xF}.${bytes[2]>>4&0xF}.${bytes[2]&0xF}`;
+      data.banda = bands[bytes[3]] || 'Desconhecido';
+      data.subBanda = bytes[4] === 0xFF ? null : bytes[4];
+      data.bateria = (bytes[5]<<8 | bytes[6])/1000;
+      data.modoSensor = Mode[(bytes[7]>>6)&0x3f] || 'Desconhecido';
+      data.modo_Transporte = !!(bytes[8] & 0x01);
+      break;
+
+    case 6:
+      data.uuid = bytes.slice(0,16).map(b => b.toString(16).padStart(2,'0')).join('');
+      data.major = bytes[16]<<8 | bytes[17];
+      data.minor = bytes[18]<<8 | bytes[19];
+      data.power = bytes[15];
+      data.rssi = toSigned(bytes[23]);
+      data.bateria = ((bytes[24] & 0x3f)<<8 | bytes[25])/1000;
+      data.alarme = !!(bytes[24] & 0x40);
+      data.modo = (bytes[26] >> 6) & 3;
+      break;
+
+    case 7:
+      data.bateria = ((bytes[0] & 0x3f)<<8 | bytes[1])/1000;
+      data.alarme = !!(bytes[0] & 0x40);
+      data.modo = bytes[2] & 0xC0;
+      break;
+
+    case 8:
+      data.ssid = String.fromCharCode(...bytes.slice(0,6));
+      data.rssi = toSigned(bytes[6]);
+      data.bateria = ((bytes[7] & 0x3f)<<8 | bytes[8])/1000;
+      data.alarme = !!(bytes[7] & 0x40);
+      data.modo = (bytes[9] >> 6) & 3;
+      break;
+
+    case 9:
+      data.beacons = [];
+      for(let i=3; i<bytes.length; i+=5) {
+        data.beacons.push({
+          major: bytes[i]<<8 | bytes[i+1],
+          minor: bytes[i+2]<<8 | bytes[i+3],
+          rssi: toSigned(bytes[i+4])
+        });
+      }
+      data.bateria = ((bytes[0] & 0x3f)<<8 | bytes[1])/1000;
+      data.alarme = !!(bytes[0] & 0x40);
+      break;
+
+    case 10:
+      if(bytes.length !== 38) return { errors: ["Invalid length"] };
+      data.beacons = [];
+      for(let i=0; i<35; i+=7) {
+        data.beacons.push({
+          mac: bytes.slice(i,i+6).map(b => b.toString(16).padStart(2,'0')).join(':'),
+          rssi: toSigned(bytes[i+6])
+        });
+      }
+      data.bateria = ((bytes[35] & 0x3f)<<8 | bytes[36])/1000;
+      data.alarme = !!(bytes[35] >> 6);
+      data.modoBLE = (bytes[37] >> 5) & 7;
+      data.modo_Transporte = !!(bytes[37] >> 3 & 1);
+      break;
+
+    default:
+      return { errors: ["Porta desconhecida"] };
+  }
+
+  return { data: data };
+}
