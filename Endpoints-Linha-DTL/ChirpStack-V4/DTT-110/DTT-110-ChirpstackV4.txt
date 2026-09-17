@@ -18,8 +18,8 @@ function decodeUplink(input) {
       data.movimento = (bytes[18] & 0x10) ? "MOVIMENTANDO" : "PARADO";
 
       if(port === 2 && (bytes[18] & 0xC0) !== 1 && !(bytes[18]>>3 & 1)) {
-        data.temperatura = (bytes[19]<<8 | bytes[20])/10;
-        data.umidade = (bytes[21]<<8 | bytes[22])/10;
+        data.umidade = (bytes[19]<<8 | bytes[20])/10;
+        data.temperatura = (bytes[21]<<8 | bytes[22])/10;
       }
       break;
 
